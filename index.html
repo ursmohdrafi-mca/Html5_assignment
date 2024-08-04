@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<body>
+<input id="num" type="number" max="100" /></br><br/><br/>
+<p>Count numbers: <output id="result"></output></p>
+<button onclick="startWorker()">Start Worker</button>
+<button onclick="stopWorker()">Stop Worker</button>
+
+<script>
+var w;
+
+function startWorker() {
+  window.sessionStorage.setItem("inputNum", document.getElementById("num").value);
+  if (typeof(Worker) !== "undefined") {
+    if (typeof(w) == "undefined") {
+      w = new Worker("demo_workers.js");
+      w.postMessage(+document.getElementById("num").value);
+    }
+    w.onmessage = function(event) {
+      document.getElementById("result").innerHTML = event.data;
+      if(isPrime(event.data)){
+        stopWorker();
+      };
+    };
+  } else {
+    document.getElementById("result").innerHTML = "Sorry! No Web Worker support.";
+  }
+}
+
+function stopWorker() {
+  w.terminate();
+  w = undefined;
+}
+
+
+  const isPrime = num => {
+    for(let i = 2, s = Math.sqrt(num); i <= s; i++) {
+        if(num % i === 0) return false;
+    }
+    return num > 1;
+
+}
+</script>
+
+</body>
+</html>
